@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Daftar tugas To Do yang perlu dikerjakan.">
+  <title>To Do — Daily Tasks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body data-page="todo">
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="brand">
+          <div class="brand-icon">✓</div>
+          <div class="brand-text">To do List <span>App</span></div>
+        </a>
+      </div>
+
+      <div class="nav-label">Menu</div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="todo.html" class="nav-item active">
+          <span class="nav-icon">📝</span>
+          <span>To Do</span>
+          <span class="nav-badge" id="badgeTodo">0</span>
+        </a>
+        <a href="done.html" class="nav-item">
+          <span class="nav-icon">✓</span>
+          <span>Selesai</span>
+          <span class="nav-badge" id="badgeDone">0</span>
+        </a>
+        <a href="overdue.html" class="nav-item">
+          <span class="nav-icon">⚠️</span>
+          <span>Terlambat</span>
+          <span class="nav-badge" id="badgeOverdue">0</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="profile-button" onclick="openProfileModal()" type="button" title="Ubah profil">
+          <div class="profile-avatar" id="profileAvatar">P</div>
+          <div class="profile-meta">
+            <div class="profile-name" id="profileName">Pengguna</div>
+            <div class="profile-role" id="profileRole">Workspace</div>
+          </div>
+        </button>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-left">
+          <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Buka navigasi">☰</button>
+          <h1 class="page-title">To Do</h1>
+        </div>
+        <div class="header-right">
+          <span class="header-date" id="headerDate"></span>
+          <button class="btn-primary" onclick="openAddModal()">+ Tambah Tugas</button>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <section class="card-section">
+          <div class="section-head">
+            <div class="section-title-wrap">
+              <h2 class="section-title">Daftar Pekerjaan Aktif</h2>
+              <span class="section-count" id="todoCount">0</span>
+            </div>
+          </div>
+
+          <!-- Toolbar Search & Filter -->
+          <div class="toolbar">
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchInput" class="search-input" placeholder="Cari tugas...">
+            </div>
+            <select id="priorityFilter" class="filter-select">
+              <option value="all">Semua Prioritas</option>
+              <option value="high">Prioritas Tinggi</option>
+              <option value="medium">Prioritas Sedang</option>
+              <option value="low">Prioritas Rendah</option>
+            </select>
+          </div>
+
+          <div class="task-list" id="todoList"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <!-- Add Modal -->
+  <dialog id="addModal" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Tambah Tugas</h2>
+        <button class="modal-close" onclick="closeAddModal()" type="button">✕</button>
+      </div>
+      <form id="addForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="inputTitle">Judul Tugas</label>
+            <input type="text" id="inputTitle" class="form-control" placeholder="Tuliskan tugas..." required autofocus>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inputDesc">Deskripsi (opsional)</label>
+            <textarea id="inputDesc" class="form-control" rows="2" placeholder="Catatan tambahan..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="inputPriority">Prioritas</label>
+              <select id="inputPriority" class="form-control">
+                <option value="low">Rendah</option>
+                <option value="medium" selected>Sedang</option>
+                <option value="high">Tinggi</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputDueDate">Tenggat Waktu</label>
+              <input type="date" id="inputDueDate" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeAddModal()">Batal</button>
+          <button type="submit" class="btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Edit Modal -->
+  <dialog id="editModal" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Tugas</h2>
+        <button class="modal-close" onclick="closeEditModal()" type="button">✕</button>
+      </div>
+      <form id="editForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="editTitle">Judul Tugas</label>
+            <input type="text" id="editTitle" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editDesc">Deskripsi</label>
+            <textarea id="editDesc" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="editPriority">Prioritas</label>
+              <select id="editPriority" class="form-control">
+                <option value="low">Rendah</option>
+                <option value="medium">Sedang</option>
+                <option value="high">Tinggi</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editDueDate">Tenggat Waktu</label>
+              <input type="date" id="editDueDate" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeEditModal()">Batal</button>
+          <button type="submit" class="btn-primary">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Delete Modal -->
+  <dialog id="deleteModal" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Konfirmasi Hapus</h2>
+        <button class="modal-close" onclick="closeDeleteModal()" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13.5px; color: var(--text-secondary);">Apakah kamu yakin ingin menghapus tugas ini secara
+          permanen?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeDeleteModal()">Batal</button>
+        <button type="button" class="btn-danger-outline" id="confirmDeleteBtn">Hapus</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Profile Modal -->
+  <dialog id="profileModal" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Ubah Profil</h2>
+        <button class="modal-close" onclick="closeProfileModal()" type="button">✕</button>
+      </div>
+      <form id="profileForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="profileInputName">Nama</label>
+            <input type="text" id="profileInputName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="profileInputRole">Peran / Posisi</label>
+            <input type="text" id="profileInputRole" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeProfileModal()">Batal</button>
+          <button type="submit" class="btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+</body>
+
+</html>
